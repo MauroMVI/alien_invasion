@@ -2,10 +2,13 @@ import sys
 
 import pygame
 
+from random import randint
+
 from settings import Settings
 from ship import Ship
 from bullet import Bullet
 from alien import Alien
+from star import Star
 
 class AlienInvasion:
     """Overall class to manage game assets and behavior"""
@@ -24,8 +27,10 @@ class AlienInvasion:
         self.ship = Ship(self)
         self.bullets = pygame.sprite.Group()
         self.aliens = pygame.sprite.Group()
+        self.stars = pygame.sprite.Group()
 
         self._create_fleet()
+        self._create_space()
 
 
     def run_game(self):
@@ -124,9 +129,42 @@ class AlienInvasion:
         self.aliens.add(alien)
 
 
+    def _create_space(self):
+        """Create the stars in space."""
+        # Make a star and find the number of stars in a row.
+        # Spacing between each star is equal to one star width.
+        star = Star(self)
+        star_width, star_height = star.rect.size
+        available_space_x = self.settings.screen_width - (2 * star_width)
+        number_star_x = available_space_x // (2 * star_width)
+
+        # Determine the number of rows of stars that fit on the screen.
+        ship_height = self.ship.rect.height
+        available_space_y = self.settings.screen_height
+        number_rows = available_space_y // (2 * star_height)
+
+        # Create stars in space.
+        for row_number in range(number_rows):
+            for star_number in range(number_star_x):
+                self._create_star(star_number, row_number)
+
+
+    def _create_star(self, star_number, row_number):
+        """Create a star and place it in the row."""
+        star = Star(self)
+        star_width, star_height = star.rect.size
+        star.x = star_width + (randint(1, 10)) * 2 *  star_width * star_number
+        star.rect.x = star.x
+        star.rect.y = (star.rect.height + (randint(1, 10)) 
+                        * 2 * star.rect.height * row_number
+                        )
+        self.stars.add(star)
+
+
     def _update_screen(self):
         """Update images on the screen, and flip to the new screen."""
         self.screen.fill(self.settings.bg_color)
+        self.stars.draw(self.screen)
         self.ship.blitme()
         for bullet in self.bullets.sprites():
             bullet.draw_bullet()
