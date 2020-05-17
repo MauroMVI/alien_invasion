@@ -15,3 +15,6 @@ class Star(Sprite):
         # Start each new star near the top left of the screen
         self.rect.x = self.rect.width
         self.rect.y = self.rect.height
+
+        # Store the alien's exact horizontal position.
+        # self.x = float(self.rect.x)
